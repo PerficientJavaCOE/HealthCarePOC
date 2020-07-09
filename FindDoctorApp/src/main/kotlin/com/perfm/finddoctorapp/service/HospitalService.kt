@@ -1,8 +1,10 @@
 package com.perfm.finddoctorapp.service
 
+import com.perfm.finddoctorapp.exception.DetailsNotFoundException
 import com.perfm.finddoctorapp.exception.HospitalDetailNotValidException
 import com.perfm.finddoctorapp.exception.HospitalNotFoundException
-import com.perfm.finddoctorapp.model.*
+import com.perfm.finddoctorapp.model.HospitalDetails
+import com.perfm.finddoctorapp.model.Response
 import com.perfm.finddoctorapp.repository.HospitalDetailsRepository
 import com.perfm.finddoctorapp.util.BasicCrud
 import org.kie.api.runtime.KieContainer
@@ -25,9 +27,9 @@ class HospitalService(@Autowired val kieContainer: KieContainer, @Autowired val 
     override fun getById(id: String): Optional<HospitalDetails> {
         log.debug("Inside HospitalService::getById()")
         return if(hospitalDetailsRepository.existsById(id))
-            hospitalDetailsRepository.findById(id)
+                    hospitalDetailsRepository.findById(id)
         else
-            throw HospitalNotFoundException("Hospital Detail Not Found")
+            throw DetailsNotFoundException("Hospital Detail for Hospital Id: $id Not Found")
     }
 
     @Throws(HospitalDetailNotValidException::class)
@@ -58,7 +60,7 @@ class HospitalService(@Autowired val kieContainer: KieContainer, @Autowired val 
         return if (hospitalDetailsRepository.existsById(id))
             hospitalDetailsRepository.findById(id).apply { this.ifPresent { hospitalDetailsRepository.delete(it) } }
         else
-            throw HospitalNotFoundException("Hospital Detail Not Found")
+            throw DetailsNotFoundException("Hospital Detail for Hospital Id: $id Not Found")
     }
 
     fun deleteAllHospitalCollections(){

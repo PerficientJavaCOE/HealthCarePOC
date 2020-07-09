@@ -16,36 +16,9 @@ import java.util.*
 @RequestMapping("/api/hospital")
 class HospitalController(private val messageProducer: MessageProducer, private val hospitalService: HospitalService) {
 
-    @GetMapping("/{id}")
-    fun getHospitalDetailById(@PathVariable id: String): Optional<HospitalDetails> {
-        try {
-           return hospitalService.getById(id)
-        } catch (ex: HospitalNotFoundException) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, ex.message, ex);
-        }
-    }
-
-    @GetMapping("/all")
-    fun getAllHospitalDetails(pageable: Pageable): Page<HospitalDetails> = hospitalService.getAll(pageable)
-    @PostMapping("/add")
-    fun saveHospitalDetails(@RequestBody hospitalDetails: HospitalDetails): HospitalDetails {
-        try {
-            return hospitalService.insert(hospitalDetails)
-        } catch (ex: HospitalDetailNotValidException) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, ex.message, ex);
-        }
-    }
-
-    @DeleteMapping("/delete/{id}")
-    fun deleteHospitalDetalsById(@PathVariable id: String): Optional<HospitalDetails> {
-        try {
-            return hospitalService.deleteById(id)
-        } catch (ex: HospitalDetailNotValidException) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, ex.message, ex);
-        }
-    }
-
-    @PutMapping("/update")
-    fun updateHospitalDetails(@RequestBody hospitalDetails: HospitalDetails): HospitalDetails = hospitalService.update(hospitalDetails)
-
+    @GetMapping("/{id}") fun getHospitalDetailById(@PathVariable id: String): Optional<HospitalDetails> = hospitalService.getById(id)
+    @GetMapping("/all") fun getAllHospitalDetails(pageable: Pageable): Page<HospitalDetails> = hospitalService.getAll(pageable)
+    @PostMapping("/add") fun saveHospitalDetails(@RequestBody hospitalDetails: HospitalDetails): HospitalDetails = hospitalService.insert(hospitalDetails)
+    @DeleteMapping("/delete/{id}") fun deleteHospitalDetalsById(@PathVariable id: String): Optional<HospitalDetails> = hospitalService.deleteById(id)
+    @PutMapping("/update") fun updateHospitalDetails(@RequestBody hospitalDetails: HospitalDetails): HospitalDetails = hospitalService.update(hospitalDetails)
 }

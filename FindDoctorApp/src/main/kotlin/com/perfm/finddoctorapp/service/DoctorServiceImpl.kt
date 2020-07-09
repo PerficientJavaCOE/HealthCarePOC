@@ -1,5 +1,7 @@
 package com.perfm.finddoctorapp.service
 
+import com.perfm.finddoctorapp.exception.DetailsNotFoundException
+import com.perfm.finddoctorapp.exception.DoctorDetailNotValidExceptions
 import com.perfm.finddoctorapp.model.Doctor
 import com.perfm.finddoctorapp.model.Response
 import com.perfm.finddoctorapp.repository.DoctorRepository
@@ -22,21 +24,25 @@ class DoctorServiceImpl(@Autowired val kieContainer: KieContainer, val doctorRep
     }
     override fun getById(id: String): Optional<Doctor> {
         log.debug("Inside DoctorServiceImpl::getById()")
-        return doctorRepository.findById(id)
+        return if(doctorRepository.existsById(id))
+                    doctorRepository.findById(id)
+        else
+            throw DetailsNotFoundException("Doctor Detail for Doctor Id: $id Not Found")
+
     }
     override fun insert(obj: Doctor): Doctor {
         val responseMessage: Response = validateDoctorDetails(obj)
         return if(responseMessage.message.isEmpty())
            doctorRepository.insert(obj.apply { this.hospitalAffiliation.hospitalDetails=hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get()})
          else
-           obj
+           throw DoctorDetailNotValidExceptions(responseMessage.message)
     }
     override fun update(obj: Doctor): Doctor {
         log.debug("Inside DoctorServiceImpl::update()")
         return if (doctorRepository.existsById(obj.id))
             doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get() })
         else
-            insert(obj)
+            throw DetailsNotFoundException("Doctor Detail for Doctor Id: ${obj.id} Not Found")
     }
     override fun deleteById(id: String): Optional<Doctor> {
         log.debug("Inside DoctorServiceImpl::deleteById()")

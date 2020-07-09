@@ -10,17 +10,15 @@ import org.springframework.validation.ObjectError
 import java.time.LocalDateTime
 import java.util.function.Consumer
 
-@JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.CUSTOM, property = "error", visible = true)
-@JsonTypeIdResolver(LowerCaseClassNameResolver::class)
 data class ApiError(var status: HttpStatus)  {
 
-    private var message: String? = null
-    private var debugMessage: String? = null
+    var message: String? = null
+    var debugMessage: String? = null
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private var timestamp: LocalDateTime? = null
+    var timestamp: LocalDateTime? = null
 
-    private var subErrors = ArrayList<ApiSubError>()
+    var subErrors = ArrayList<ApiSubError>()
 
     constructor(_status: HttpStatus, _ex: Throwable ): this(_status) {
         message = "Unexpected error"
