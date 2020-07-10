@@ -13,6 +13,6 @@ class DoctorController(private val doctorServiceImpl: DoctorServiceImpl) {
 
     @GetMapping("/all") fun getAllDoctors(pageable: Pageable) : Page<Doctor> = doctorServiceImpl.getAll(pageable)
     @GetMapping("/{doctorId}") fun getDoctorById(@PathVariable doctorId: String ): Optional<Doctor> = doctorServiceImpl.getById(doctorId)
-    @PostMapping("/add") fun insertDoctorDetails(@RequestBody doctor: Doctor) : Doctor = doctorServiceImpl.insert(doctor)
+    @PostMapping("/add") fun insertDoctorDetails(@RequestBody doctor: Doctor) : Doctor = doctorServiceImpl.upsert(doctor)
     @DeleteMapping("/delete/{id}") fun deleteDoctorById(@PathVariable id : String): Optional<Doctor> = doctorServiceImpl.deleteById(id)
 }

@@ -25,7 +25,7 @@ class DoctorServiceImpl(@Autowired val kieContainer: KieContainer, val doctorRep
     override fun getById(id: String): Optional<Doctor> {
         log.debug("Inside DoctorServiceImpl::getById()")
         return if(doctorRepository.existsById(id))
-                    doctorRepository.findById(id)
+            doctorRepository.findById(id)
         else
             throw DetailsNotFoundException("Doctor Detail for Doctor Id: $id Not Found")
 
@@ -33,17 +33,34 @@ class DoctorServiceImpl(@Autowired val kieContainer: KieContainer, val doctorRep
     override fun insert(obj: Doctor): Doctor {
         val responseMessage: Response = validateDoctorDetails(obj)
         return if(responseMessage.message.isEmpty())
-           doctorRepository.insert(obj.apply { this.hospitalAffiliation.hospitalDetails=hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get()})
-         else
-           throw DoctorDetailNotValidExceptions(responseMessage.message)
+            doctorRepository.insert(obj.apply { this.hospitalAffiliation.hospitalDetails=hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get()})
+        else
+            throw DoctorDetailNotValidExceptions(responseMessage.message)
     }
     override fun update(obj: Doctor): Doctor {
         log.debug("Inside DoctorServiceImpl::update()")
         return if (doctorRepository.existsById(obj.id))
-            doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get() })
+            doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get()})
         else
             throw DetailsNotFoundException("Doctor Detail for Doctor Id: ${obj.id} Not Found")
     }
+
+    fun upsert(obj: Doctor): Doctor {
+        val responseMessage: Response = validateDoctorDetails(obj)
+        return if (!doctorRepository.existsById(obj.id)) {
+            if(responseMessage.message.isEmpty())
+                doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get() })
+            else
+                throw DoctorDetailNotValidExceptions(responseMessage.message)
+        }
+        else {
+            return if (doctorRepository.existsById(obj.id))
+                doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get() })
+            else
+                throw DetailsNotFoundException("Doctor Detail for Doctor Id: ${obj.id} Not Found")
+        }
+    }
+
     override fun deleteById(id: String): Optional<Doctor> {
         log.debug("Inside DoctorServiceImpl::deleteById()")
         return doctorRepository.findById(id).apply { this.ifPresent{doctorRepository.delete(it)} }

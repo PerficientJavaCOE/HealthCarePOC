@@ -17,8 +17,8 @@ class MessageConsumer(private val doctorServiceImpl: DoctorServiceImpl){
 
     @KafkaListener(topics = ["\${doctor.topic.name}"], containerFactory = "doctorKafkaListenerContainerFactory")
     fun doctorListener(doctor: Doctor) {
-        log.debug("Recieved message: $doctor")
-        val savedDoctorDetails : Doctor = doctorServiceImpl.update(doctor)
+        log.debug("Received message: $doctor")
+        val savedDoctorDetails : Doctor = doctorServiceImpl.upsert(doctor)
         log.debug("Doctor details persisted in MongoDB: $savedDoctorDetails")
         Latch1.countDown()
     }
