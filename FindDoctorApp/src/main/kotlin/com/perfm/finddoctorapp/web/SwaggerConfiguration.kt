@@ -34,7 +34,7 @@ class SwaggerConfiguration {
             .version("1.0.1")
             .license("Apache License Version 2.0")
             .licenseUrl("https://www.apache.org/licenses/LICENSE-2.0\"")
-            .contact(Contact("Anbu", "http://localhost:8086/", "ttt@gmail.com"))
+            .contact(Contact("Perficient", "http://localhost:8086/", "perfm@perficient.com"))
             .build()
 }
 }

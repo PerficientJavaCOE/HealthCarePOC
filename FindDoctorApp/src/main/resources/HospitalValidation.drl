@@ -4,6 +4,7 @@ import com.perfm.finddoctorapp.model.Response
 global com.perfm.finddoctorapp.model.Response responseResult
 
 dialect  "mvel"
+dialect "java"
 
 rule "HospitalDetailsValidation"
     when
@@ -37,3 +38,22 @@ rule "CountryValidation"
 	    responseResult.setCode(1003);
         responseResult.setMessage("Country is not valid");
 end
+
+rule "HospitalId validation"
+	when
+		hospital: HospitalDetails(id != null && id not matches "H.*")
+	then
+	    responseResult.setCode(1004);
+        responseResult.setMessage("Hospital Id is not valid");
+end
+
+//"^[0-9]{5}(?:-[0-9]{4})?$"
+
+rule "Hospital Address ZipCode validation"
+	when
+		hospital: HospitalDetails(id != null && id not matches "H.*")
+	then
+	    responseResult.setCode(1004);
+        responseResult.setMessage("Hospital Id is not valid");
+end
+
