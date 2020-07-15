@@ -18,7 +18,7 @@ class HospitalController(private val messageProducer: MessageProducer, private v
 
     @GetMapping("/{id}") fun getHospitalDetailById(@PathVariable id: String): Optional<HospitalDetails> = hospitalService.getById(id)
     @GetMapping("/all") fun getAllHospitalDetails(pageable: Pageable): Page<HospitalDetails> = hospitalService.getAll(pageable)
-    @PostMapping("/add") fun saveHospitalDetails(@RequestBody hospitalDetails: HospitalDetails): HospitalDetails = hospitalService.insert(hospitalDetails)
+    @PostMapping("/add") fun saveHospitalDetails(@RequestBody hospitalDetails: HospitalDetails): HospitalDetails = hospitalService.upsert(hospitalDetails)
     @DeleteMapping("/delete/{id}") fun deleteHospitalDetalsById(@PathVariable id: String): Optional<HospitalDetails> = hospitalService.deleteById(id)
-    @PutMapping("/update") fun updateHospitalDetails(@RequestBody hospitalDetails: HospitalDetails): HospitalDetails = hospitalService.update(hospitalDetails)
+    @PutMapping("/update") fun updateHospitalDetails(@RequestBody hospitalDetails: HospitalDetails): HospitalDetails = hospitalService.upsert(hospitalDetails)
 }

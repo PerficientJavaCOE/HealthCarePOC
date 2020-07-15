@@ -1,7 +1,7 @@
 import com.perfm.finddoctorapp.model.Doctor
-import com.perfm.finddoctorapp.model.Response
+import com.perf.configuration.drools.droolsconfiguration.Response
 
-global com.perfm.finddoctorapp.model.Response responseResult
+global com.perf.configuration.drools.droolsconfiguration.Response responseResult
 
 dialect  "mvel"
 

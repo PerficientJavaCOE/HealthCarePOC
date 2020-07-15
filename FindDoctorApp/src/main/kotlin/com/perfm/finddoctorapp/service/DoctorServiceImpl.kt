@@ -1,22 +1,22 @@
 package com.perfm.finddoctorapp.service
 
+import com.perf.configuration.drools.droolsconfiguration.DroolsConfig
+import com.perf.configuration.drools.droolsconfiguration.Response
 import com.perfm.finddoctorapp.exception.DetailsNotFoundException
 import com.perfm.finddoctorapp.exception.DoctorDetailNotValidExceptions
 import com.perfm.finddoctorapp.model.Doctor
-import com.perfm.finddoctorapp.model.Response
 import com.perfm.finddoctorapp.repository.DoctorRepository
 import com.perfm.finddoctorapp.repository.HospitalDetailsRepository
 import com.perfm.finddoctorapp.util.BasicCrud
-import org.kie.api.runtime.KieContainer
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class DoctorServiceImpl(@Autowired val kieContainer: KieContainer, val doctorRepository: DoctorRepository, val hospitalDetailsRepository: HospitalDetailsRepository):BasicCrud<String, Doctor> {
+class DoctorServiceImpl(val doctorRepository: DoctorRepository, val hospitalDetailsRepository: HospitalDetailsRepository):BasicCrud<String, Doctor>,
+        DroolsConfig() {
     private val log = LoggerFactory.getLogger(DoctorServiceImpl::class.java)
     override fun getAll(pageable: Pageable): Page<Doctor> {
         log.debug("Inside DoctorServiceImpl::getAll()")
@@ -31,7 +31,7 @@ class DoctorServiceImpl(@Autowired val kieContainer: KieContainer, val doctorRep
 
     }
     override fun insert(obj: Doctor): Doctor {
-        val responseMessage: Response = validateDoctorDetails(obj)
+        val responseMessage: Response = validateDoctorDetails(obj,"responseResult")
         return if(responseMessage.message.isEmpty())
             doctorRepository.insert(obj.apply { this.hospitalAffiliation.hospitalDetails=hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get()})
         else
@@ -46,19 +46,12 @@ class DoctorServiceImpl(@Autowired val kieContainer: KieContainer, val doctorRep
     }
 
     fun upsert(obj: Doctor): Doctor {
-        val responseMessage: Response = validateDoctorDetails(obj)
-        return if (!doctorRepository.existsById(obj.id)) {
-            if(responseMessage.message.isEmpty())
-                doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get() })
-            else
-                throw DoctorDetailNotValidExceptions(responseMessage.message)
+        val responseMessage: Response = validateDoctorDetails(obj,"responseResult")
+        return if(responseMessage.message.isEmpty()) {
+            doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get() })
         }
-        else {
-            return if (doctorRepository.existsById(obj.id))
-                doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get() })
-            else
-                throw DetailsNotFoundException("Doctor Detail for Doctor Id: ${obj.id} Not Found")
-        }
+        else
+            throw DoctorDetailNotValidExceptions(responseMessage.message)
     }
 
     override fun deleteById(id: String): Optional<Doctor> {
@@ -68,18 +61,5 @@ class DoctorServiceImpl(@Autowired val kieContainer: KieContainer, val doctorRep
     fun deleteAllDoctorCollections(){
         log.debug("Inside DoctorServiceImpl::deleteAllDoctorCollections()")
         doctorRepository.deleteAll()
-    }
-
-    fun validateDoctorDetails(obj: Doctor): Response {
-        val responseResult: Response = Response()
-        val kieSession = kieContainer.newKieSession()
-        kieSession.setGlobal("responseResult", responseResult)
-        kieSession.insert(obj) // which object to validate
-        kieSession.fireAllRules() // fire all rules defined into drool file (drl)
-        kieSession.dispose()
-        if (!responseResult.message.isEmpty()) {
-            log.info("responseResult code is ${responseResult.code} and message is ${responseResult.message}")
-        }
-        return responseResult
     }
 }
