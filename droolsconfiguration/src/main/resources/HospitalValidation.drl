@@ -1,0 +1,60 @@
+import com.perfm.finddoctorapp.model.HospitalDetails
+import com.perfm.finddoctorapp.model.Response
+
+global com.perf.configuration.drools.droolsconfiguration.Response responseResult
+
+dialect  "mvel"
+dialect "java"
+
+rule "Hospital Details Validation"
+    when
+      hospital:  HospitalDetails(id.isEmpty() || hospitalName.isEmpty() || city.isEmpty() || country.isEmpty() || address.isEmpty() || zipCode.isEmpty()
+                        ||id == null || hospitalName == null || city == null || country == null || address == null || zipCode == null)
+    then
+        responseResult.setMessage("Id, HospitalName, City, Country, Address, ZipCode are required values");
+end
+
+rule "Hospital Id validation"
+	when
+		hospital: HospitalDetails(id != null && id not matches "H.*")
+	then
+		responseResult.setMessage("Hospital Id is not valid");
+	end
+
+rule "Hospital Name Validation"
+	when
+		hospital: HospitalDetails(hospitalName != null, hospitalName not matches "[A-Z a-z ]*")
+	then
+        responseResult.setMessage("Hospital Name is not valid");
+end
+
+rule "Hospital Address validation"
+	when
+		hospital: HospitalDetails(address != null, address not matches "[A-Za-z0-9 ]*")
+	then
+		responseResult.setMessage("Hospital Address is not valid");
+end
+
+rule "City Validation"
+	when
+		hospital: HospitalDetails(city != null && city not matches "[A-Z a-z ]*")
+	then
+        responseResult.setMessage("Hospital City is not valid");
+end
+
+rule "Hospital ZipCode validation"
+	when
+		hospital: HospitalDetails(zipCode != null, zipCode not matches "^[0-9]{5}(?:-[0-9]{4})?$")
+	then
+		responseResult.setMessage("Hospital ZipCode is not valid");
+end
+
+rule "Country Validation"
+	when
+		hospital: HospitalDetails(country != null && country not matches "[A-Za-z ]*")
+	then
+        responseResult.setMessage("Hospital Country is not valid");
+end
+
+//"^[0-9]{5}(?:-[0-9]{4})?$"
+
