@@ -9,14 +9,14 @@ import org.springframework.context.annotation.Configuration
 import java.io.File
 
 @Configuration
-@ComponentScan("com.perfm.drools.droolsengine")
+@ComponentScan("com.perfm.drools.droolsengine.config")
 class DroolsConfiguration {
 
     @Bean
     fun kieContainer(): KieContainer? {
         val kieServices = KieServices.Factory.get()
         val kieFileSystem = kieServices.newKieFileSystem()
-        val dir = File("src/main/resources")
+        val dir = File("droolsengine/src/main/resources")
         val directoryListing: Array<File> = dir.listFiles()
         if (directoryListing != null) {
             for(child in directoryListing)
