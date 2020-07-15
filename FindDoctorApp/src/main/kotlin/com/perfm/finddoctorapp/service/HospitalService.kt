@@ -1,13 +1,12 @@
 package com.perfm.finddoctorapp.service
 
+import com.perfm.finddoctorapp.client.DroolsClient
 import com.perfm.finddoctorapp.exception.DetailsNotFoundException
 import com.perfm.finddoctorapp.exception.HospitalDetailNotValidException
-import com.perfm.finddoctorapp.exception.HospitalNotFoundException
 import com.perfm.finddoctorapp.model.HospitalDetails
 import com.perfm.finddoctorapp.model.Response
 import com.perfm.finddoctorapp.repository.HospitalDetailsRepository
 import com.perfm.finddoctorapp.util.BasicCrud
-import org.kie.api.runtime.KieContainer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class HospitalService(@Autowired val kieContainer: KieContainer, @Autowired val hospitalDetailsRepository: HospitalDetailsRepository):BasicCrud<String,HospitalDetails> {
+class HospitalService(@Autowired val hospitalDetailsRepository: HospitalDetailsRepository, private val droolsClient: DroolsClient):BasicCrud<String,HospitalDetails> {
     private val log = LoggerFactory.getLogger(HospitalService::class.java)
 
     override fun getAll(pageable: Pageable): Page<HospitalDetails> {
@@ -35,7 +34,7 @@ class HospitalService(@Autowired val kieContainer: KieContainer, @Autowired val 
     @Throws(HospitalDetailNotValidException::class)
     override fun insert(obj: HospitalDetails): HospitalDetails {
         log.debug("Inside HospitalService::insert()")
-        val responseMessage: Response = validateDoctorDetails(obj)
+        val responseMessage: Response = droolsClient.validateHospitalDetails(obj)
         if (!responseMessage.message.isEmpty()){
             log.info("responseResult code is ${responseMessage.code} and message is ${responseMessage.message}")
         }
@@ -68,16 +67,4 @@ class HospitalService(@Autowired val kieContainer: KieContainer, @Autowired val 
         hospitalDetailsRepository.deleteAll()
     }
 
-    fun validateDoctorDetails(obj: HospitalDetails): Response {
-        val responseResult: Response = Response()
-        val kieSession = kieContainer.newKieSession()
-        kieSession.setGlobal("responseResult", responseResult)
-        kieSession.insert(obj) // which object to validate
-        kieSession.fireAllRules() // fire all rules defined into drool file (drl)
-        kieSession.dispose()
-        if (!responseResult.message.isEmpty()) {
-            log.info("responseResult code is ${responseResult.code} and message is ${responseResult.message}")
-        }
-        return responseResult
-    }
 }

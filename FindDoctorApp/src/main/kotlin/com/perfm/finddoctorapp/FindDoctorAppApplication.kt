@@ -11,9 +11,13 @@ import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient
+import org.springframework.cloud.openfeign.EnableFeignClients
 import java.time.LocalDate
 
-@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients("com.perfm.finddoctorapp.client")
+@SpringBootApplication(scanBasePackages = arrayOf("com.perfm.finddoctorapp"))
 class FindDoctorAppApplication(private val doctorServiceImpl: DoctorServiceImpl, private val hospitalService: HospitalService,
                                 private val hospitalDetailsRepository: HospitalDetailsRepository,
 								private val doctorRepository: DoctorRepository) : ApplicationRunner{
