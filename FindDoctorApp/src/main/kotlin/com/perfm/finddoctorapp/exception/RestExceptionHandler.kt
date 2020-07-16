@@ -29,6 +29,13 @@ class RestExceptionHandler {
         apiError.message = ex.message
         return buildResponseEntity(apiError)
     }
+//ProducerException
+    @ExceptionHandler(ProducerException::class)
+    fun handleProducerException(ex: ProducerException): ResponseEntity<Any> {
+        val apiError = ApiError(HttpStatus.NOT_FOUND)
+        apiError.message = "Error code 40401" + ex.message
+        return buildResponseEntity(apiError)
+    }
 
     private fun buildResponseEntity(apiError: ApiError): ResponseEntity<Any> = ResponseEntity(apiError, apiError.status)
 }

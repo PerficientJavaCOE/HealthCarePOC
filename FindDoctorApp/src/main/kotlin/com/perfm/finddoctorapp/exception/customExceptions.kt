@@ -17,3 +17,6 @@ class HospitalNotFoundException(val msg: String): RuntimeException(msg){}
 
 @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Hospital Details Not Valid")
 class HospitalDetailNotValidException(val msg: String): RuntimeException(msg){}
+
+@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Record Not published successfully")
+class ProducerException(val msg: String): RuntimeException(msg){}
