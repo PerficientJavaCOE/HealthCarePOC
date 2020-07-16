@@ -54,6 +54,16 @@ class HospitalService(@Autowired val hospitalDetailsRepository: HospitalDetailsR
         }
     }
 
+    fun upsert(obj: HospitalDetails): HospitalDetails {
+        log.debug("Inside HospitalService::upsert()")
+        val responseMessage: Response = droolsClient.validateHospitalDetails(obj)
+        return if(responseMessage.message.isEmpty()) {
+            hospitalDetailsRepository.save(obj)
+        }
+        else
+            throw HospitalDetailNotValidException(responseMessage.message)
+    }
+
     override fun deleteById(id: String): Optional<HospitalDetails> {
         log.debug("Inside HospitalService::deleteById()")
         return if (hospitalDetailsRepository.existsById(id))

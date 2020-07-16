@@ -14,8 +14,8 @@ class DroolsConfiguration {
 
     @Bean
     fun kieContainer(): KieContainer? {
-        val kieServices = KieServices.Factory.get()
-        val kieFileSystem = kieServices.newKieFileSystem()
+        val kieServices = KieServices.Factory.get() // creates a instance
+        val kieFileSystem = kieServices.newKieFileSystem() // to create memory file system provided by framework for drools
         val dir = File("droolsengine/src/main/resources")
         val directoryListing: Array<File> = dir.listFiles()
         if (directoryListing != null) {
@@ -23,7 +23,7 @@ class DroolsConfiguration {
                 kieFileSystem.write(ResourceFactory.newClassPathResource(child.name))
         }
         val kieBuilder = kieServices.newKieBuilder(kieFileSystem)
-        kieBuilder.buildAll()
+        kieBuilder.buildAll() //builds all resource to kiebase
         val kieModule = kieBuilder.kieModule
         return kieServices.newKieContainer(kieModule.releaseId)
     }

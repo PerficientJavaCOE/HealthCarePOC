@@ -18,7 +18,7 @@ rule "Hospital Id validation"
 	when
 		hospital: HospitalDetails(id != null && id not matches "H.*")
 	then
-		responseResult.setMessage("Hospital Id is not valid.");
+		responseResult.setMessage(responseResult.message+"Hospital Id is not valid.");
 	end
 
 rule "Hospital Name Validation"

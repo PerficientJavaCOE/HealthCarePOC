@@ -39,13 +39,13 @@ class MessageProducer {
 
     fun sendDoctorDetails(doctor: Doctor) : String {
         log.debug("Inside sendDoctorDetails : Doctor details $doctor")
-        try {
+        return try {
             doctorKafkaTemplate!!.send(doctorTopicName!!, doctor)
-            return "Record Published successfully"
+            "Record Published successfully"
         } catch (ex: Exception) {
             log.debug("An error occurred! ${ex.message}")
+            "Record failed to Publish"
         }
-        return "Record failed to Publish"
     }
 
 

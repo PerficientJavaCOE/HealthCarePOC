@@ -52,17 +52,11 @@ class DoctorServiceImpl(@Autowired val doctorRepository: DoctorRepository, @Auto
 
     fun upsert(obj: Doctor): Doctor {
         val responseMessage: Response = droolsClient.validateDoctorDetails(obj)
-        return if (!doctorRepository.existsById(obj.id)) {
-            if (responseMessage.message.isEmpty())
-                doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get() })
-            else
-                throw DoctorDetailNotValidExceptions(responseMessage.message)
-        } else {
-            return if (doctorRepository.existsById(obj.id))
-                doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get() })
-            else
-                throw DetailsNotFoundException("Doctor Detail for Doctor Id: ${obj.id} Not Found")
+        return if(responseMessage.message.isEmpty()) {
+            doctorRepository.save(obj.apply { this.hospitalAffiliation.hospitalDetails = hospitalDetailsRepository.findById(obj.hospitalAffiliation.hospitalDetails.id).get() })
         }
+        else
+            throw DoctorDetailNotValidExceptions(responseMessage.message)
     }
 
     override fun deleteById(id: String): Optional<Doctor> {
