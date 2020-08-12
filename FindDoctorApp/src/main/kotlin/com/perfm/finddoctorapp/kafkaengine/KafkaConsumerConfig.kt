@@ -25,7 +25,6 @@ class KafkaConsumerConfig{
         val props: MutableMap<String, Any> = HashMap()
         props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapAddress!!
         props[ConsumerConfig.GROUP_ID_CONFIG] = "doctor"
-//        return DefaultKafkaConsumerFactory<Any?, Any?>(props, StringDeserializer(), JsonDeserializer<Any?>(Book::class.java))
         return DefaultKafkaConsumerFactory<String?, Doctor?>(props,StringDeserializer(), JsonDeserializer<Doctor>(Doctor::class.java))
     }
 

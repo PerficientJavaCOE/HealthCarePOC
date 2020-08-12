@@ -1,6 +1,7 @@
 package com.perfm.finddoctorapp.messageservice
 
 
+import com.perfm.finddoctorapp.exception.ProducerException
 import com.perfm.finddoctorapp.model.Doctor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,7 +39,14 @@ class MessageProducer {
 
     fun sendDoctorDetails(doctor: Doctor) : String {
         log.debug("Inside sendDoctorDetails : Doctor details $doctor")
-        doctorKafkaTemplate!!.send(doctorTopicName!!, doctor)
-        return "success"
+        return try {
+            doctorKafkaTemplate!!.send(doctorTopicName!!, doctor)
+            "Record Published successfully"
+        } catch (ex: Exception) {
+            log.debug("An error occurred! ${ex.message}")
+            "Record failed to Publish"
+        }
     }
+
+
 }

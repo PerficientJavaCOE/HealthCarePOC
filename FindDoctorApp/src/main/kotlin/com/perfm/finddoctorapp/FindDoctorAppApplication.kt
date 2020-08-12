@@ -11,9 +11,13 @@ import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient
+import org.springframework.cloud.openfeign.EnableFeignClients
 import java.time.LocalDate
 
-@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients("com.perfm.finddoctorapp.client")
+@SpringBootApplication(scanBasePackages = arrayOf("com.perfm.finddoctorapp"))
 class FindDoctorAppApplication(private val doctorServiceImpl: DoctorServiceImpl, private val hospitalService: HospitalService,
                                 private val hospitalDetailsRepository: HospitalDetailsRepository,
 								private val doctorRepository: DoctorRepository) : ApplicationRunner{
@@ -34,9 +38,9 @@ class FindDoctorAppApplication(private val doctorServiceImpl: DoctorServiceImpl,
     private fun createDoctorDetails() {
         this.cleanCollections()
 
-        val h1 = HospitalDetails(id = "H1000", hospitalName = "Santa Clara Homestead Med Center", city = "CA", country = "USA")
-        val h2 = HospitalDetails(id = "H1001", hospitalName = "San Jose Medical Center", city = "CA", country = "USA")
-        val h3 = HospitalDetails(id = "H1002", hospitalName = "Fremont Medical Center", city = "CA", country = "USA")
+        val h1 = HospitalDetails(id = "H1000", hospitalName = "Santa Clara Homestead Med Center", address = "710 Lawrence Expy", city = "CA", zipCode = "95051", country = "USA")
+        val h2 = HospitalDetails(id = "H1001", hospitalName = "San Jose Medical Center", address = "625 Lincoln Ave", city = "CA", zipCode = "95126",  country = "USA")
+        val h3 = HospitalDetails(id = "H1002", hospitalName = "Fremont Medical Center", address = "39400 Paseo Padre Parkway", city = "CA", zipCode = "94538", country = "USA")
 		val hospitalDetails = listOf(
 				h1, h2, h3
 		)
@@ -71,9 +75,9 @@ class FindDoctorAppApplication(private val doctorServiceImpl: DoctorServiceImpl,
         doctorServiceImpl.deleteAllDoctorCollections()
         hospitalService.deleteAllHospitalCollections()
     }
-    fun getHospitalDetailH1003(): HospitalDetails = HospitalDetails(id = "H1003", hospitalName = "Redwood City Medical Center", city = "CA", country = "USA")
-    fun getHospitalDetailH1004(): HospitalDetails = HospitalDetails(id = "H1004", hospitalName = "Indian Hill Medical Offices", city = "CA", country = "USA")
-    fun getHospitalDetailH1005(): HospitalDetails = HospitalDetails(id = "H1005", hospitalName = "Bv Camarillo Medical Offices", city = "CA", country = "USA")
+    fun getHospitalDetailH1003(): HospitalDetails = HospitalDetails(id = "H1003", hospitalName = "Redwood City Medical Center", address = "1190 Veterans Blvd", city = "CA", zipCode = "94063", country = "USA")
+    fun getHospitalDetailH1004(): HospitalDetails = HospitalDetails(id = "H1004", hospitalName = "Indian Hill Medical Offices", address = "250 W San Jose Ave", city = "CA", zipCode = "91711", country = "USA")
+    fun getHospitalDetailH1005(): HospitalDetails = HospitalDetails(id = "H1005", hospitalName = "Bv Camarillo Medical Offices", address = "2620 Las Posas Rd", city = "CA", zipCode = "93010", country = "USA")
 }
 
 fun main(args: Array<String>) {

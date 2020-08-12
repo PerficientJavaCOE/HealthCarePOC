@@ -1,5 +1,6 @@
 package com.perfm.finddoctorapp.messageservice
 
+import com.perfm.finddoctorapp.exception.DoctorDetailNotValidExceptions
 import com.perfm.finddoctorapp.model.Doctor
 import com.perfm.finddoctorapp.service.DoctorServiceImpl
 import org.slf4j.LoggerFactory
@@ -11,15 +12,16 @@ import java.util.concurrent.CountDownLatch
 class MessageConsumer(private val doctorServiceImpl: DoctorServiceImpl){
 
     private val log = LoggerFactory.getLogger(MessageConsumer::class.java)
-    val latch = CountDownLatch(3)
 
-    val Latch1 = CountDownLatch(1)
 
     @KafkaListener(topics = ["\${doctor.topic.name}"], containerFactory = "doctorKafkaListenerContainerFactory")
     fun doctorListener(doctor: Doctor) {
-        log.debug("Recieved message: $doctor")
-        val savedDoctorDetails : Doctor = doctorServiceImpl.update(doctor)
-        log.debug("Doctor details persisted in MongoDB: $savedDoctorDetails")
-        Latch1.countDown()
+        log.debug("Received message: $doctor")
+        try{
+            val savedDoctorDetails : Doctor = doctorServiceImpl.upsert(doctor)
+            log.debug("Doctor details persisted in MongoDB: $savedDoctorDetails")
+        }catch (ex: DoctorDetailNotValidExceptions){
+            log.debug("An error occurred and Doctor Details not persisted in MongoDB: ${ex.message}")
+        }
     }
 }
